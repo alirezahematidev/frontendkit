@@ -1,5 +1,5 @@
-import { release } from '@vitejs/release-scripts'
-import { logRecentCommits, run } from './releaseUtils'
+import { release } from '@vitejs/release-scripts';
+import { logRecentCommits, run } from './releaseUtils';
 
 release({
   repo: 'frontendkit',
@@ -7,8 +7,8 @@ release({
   toTag: (pkg, version) => `${pkg}@${version}`,
   logChangelog: logRecentCommits,
   generateChangelog: async (pkgName) => {
-    const args = ['--lerna-package', pkgName]
+    const args = ['--lerna-package', `@frontendkit/${pkgName}`];
 
-    await run('npx', args, { cwd: `packages/${pkgName}` })
+    await run('npx', args, { cwd: `packages/${pkgName}` });
   },
-})
+});

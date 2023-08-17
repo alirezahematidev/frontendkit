@@ -73,14 +73,14 @@
     "tsx": "^3.12.7",
     "typescript": "^5.0.2",
     "unbuild": "^1.2.1",
-    "components": "workspace:*",
-    "utilities": "workspace:*"
+    "@frontendkit/components": "workspace:*",
+    "@frontendkit/utilities": "workspace:*"
   },
   "packageManager": "pnpm@8.6.12",
   "pnpm": {
     "overrides": {
-      "components": "workspace:*",
-      "utilities": "workspace:*"
+      "@frontendkit/components": "workspace:*",
+      "@frontendkit/utilities": "workspace:*"
     },
     "packageExtensions": {
       "postcss-load-config": {
