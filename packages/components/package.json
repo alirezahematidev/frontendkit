@@ -1,6 +1,6 @@
 {
   "name": "@frontendkit/components",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "type": "module",
   "exports": {
     ".": {
@@ -16,6 +16,10 @@
     "dist",
     "bin"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
