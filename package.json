@@ -26,7 +26,7 @@
     "dev": "pnpm -r --parallel --filter='./packages/*' run dev",
     "playground": "pnpm -r --parallel --filter='./playground/**' run dev",
     "components:link": "pnpm -r --filter='./packages/components' run link-cli",
-    "release": "tsx scripts/release.ts",
+    "release": "pnpm build && tsx scripts/release.ts",
     "ci-publish": "tsx scripts/publishCI.ts"
   },
   "devDependencies": {
