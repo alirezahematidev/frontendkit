@@ -5,8 +5,8 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  components: workspace:*
-  utilities: workspace:*
+  '@frontendkit/components': workspace:*
+  '@frontendkit/utilities': workspace:*
 
 packageExtensionsChecksum: 696422bac84dd936748019990f84746e
 
@@ -17,6 +17,12 @@ importers:
       '@babel/types':
         specifier: ^7.22.5
         version: 7.22.5
+      '@frontendkit/components':
+        specifier: workspace:*
+        version: link:packages/components
+      '@frontendkit/utilities':
+        specifier: workspace:*
+        version: link:packages/utilities
       '@rollup/plugin-typescript':
         specifier: ^11.1.2
         version: 11.1.2(rollup@3.28.0)(tslib@2.6.1)(typescript@5.0.2)
@@ -83,9 +89,6 @@ importers:
       '@vitejs/release-scripts':
         specifier: ^1.2.1
         version: 1.2.1
-      components:
-        specifier: workspace:*
-        version: link:packages/components
       conventional-changelog-cli:
         specifier: ^3.0.0
         version: 3.0.0
@@ -146,9 +149,6 @@ importers:
       unbuild:
         specifier: ^1.2.1
         version: 1.2.1
-      utilities:
-        specifier: workspace:*
-        version: link:packages/utilities
 
   packages/components:
     dependencies:
@@ -226,6 +226,9 @@ importers:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
     devDependencies:
+      '@frontendkit/components':
+        specifier: workspace:*
+        version: link:../packages/components
       '@types/react':
         specifier: ^18.2.15
         version: 18.2.15
@@ -241,9 +244,6 @@ importers:
       '@vitejs/plugin-react-swc':
         specifier: ^3.3.2
         version: 3.3.2(vite@4.4.5)
-      components:
-        specifier: workspace:*
-        version: link:../packages/components
       eslint:
         specifier: ^8.45.0
         version: 8.46.0
