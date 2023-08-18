@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
-import dts from 'vite-plugin-dts'
-import { resolve } from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react-swc';
+import dts from 'vite-plugin-dts';
+import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react(), dts()],
@@ -16,9 +16,9 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     lib: {
+      formats: ['cjs', 'es'],
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
-        'node/cli': resolve(__dirname, 'src/node/cli.ts'),
       },
     },
     rollupOptions: {
@@ -32,4 +32,4 @@ export default defineConfig({
       },
     },
   },
-})
+});

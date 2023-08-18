@@ -1,11 +1,10 @@
-import { KitButton } from 'components';
 import './App.css';
 
 function App() {
   return (
     <>
       <div>
-        <KitButton name="alireza" />
+        <h1>Hello</h1>
       </div>
     </>
   );

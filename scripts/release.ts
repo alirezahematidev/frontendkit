@@ -3,7 +3,7 @@ import { logRecentCommits, run } from './releaseUtils';
 
 release({
   repo: 'frontendkit',
-  packages: ['components', 'utilities'],
+  packages: ['components', 'utilities', 'cli'],
   toTag: (pkg, version) => `${pkg}@${version}`,
   logChangelog: logRecentCommits,
   generateChangelog: async (pkgName) => {

@@ -1,0 +1,44 @@
+{
+  "name": "@frontendkit/cli",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "license": "ISC",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "kit": "./bin/frontkit-cli.js"
+  },
+  "files": [
+    "dist",
+    "types",
+    "bin"
+  ],
+  "homepage": "https://github.com/alirezahematidev/frontendkit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alirezahematidev/frontendkit.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/cli.test.js",
+    "build": "rollup --config rollup.config.ts --configPlugin typescript"
+  },
+  "bugs": {
+    "url": "https://github.com/alirezahematidev/frontendkit/issues"
+  },
+  "dependencies": {
+    "esbuild": "^0.19.2",
+    "rollup": "^3.28.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.0",
+    "@rollup/plugin-typescript": "^11.1.2",
+    "@types/node": "^18.17.3",
+    "fast-glob": "^3.3.1",
+    "prettier": "3.0.1",
+    "source-map-support": "^0.5.21"
+  },
+  "peerDependencies": {
+    "@types/node": ">= 16"
+  }
+}

@@ -17,6 +17,7 @@
     "frontend"
   ],
   "scripts": {
+    "revalidate": "pnpm install --no-frozen-lockfile",
     "preinstall": "npx only-allow pnpm",
     "format": "prettier --write --cache .",
     "lint": "eslint --cache .",
@@ -25,7 +26,7 @@
     "build": "pnpm -r --filter='./packages/*' run build",
     "dev": "pnpm -r --parallel --filter='./packages/*' run dev",
     "playground": "pnpm -r --parallel --filter='./playground/**' run dev",
-    "components:link": "pnpm -r --filter='./packages/components' run link-cli",
+    "cli": "pnpm -r --filter='./packages/cli' run link-cli",
     "release": "pnpm build && tsx scripts/release.ts",
     "ci-publish": "tsx scripts/publishCI.ts"
   },
@@ -71,16 +72,19 @@
     "rollup": "^3.28.0",
     "tslib": "^2.6.1",
     "tsx": "^3.12.7",
+    "uuid": "9.0.0",
     "typescript": "^5.0.2",
     "unbuild": "^1.2.1",
     "@frontendkit/components": "workspace:*",
-    "@frontendkit/utilities": "workspace:*"
+    "@frontendkit/utilities": "workspace:*",
+    "@frontendkit/cli": "workspace:*"
   },
   "packageManager": "pnpm@8.6.12",
   "pnpm": {
     "overrides": {
       "@frontendkit/components": "workspace:*",
-      "@frontendkit/utilities": "workspace:*"
+      "@frontendkit/utilities": "workspace:*",
+      "@frontendkit/cli": "workspace:*"
     },
     "packageExtensions": {
       "postcss-load-config": {

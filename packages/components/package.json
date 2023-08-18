@@ -2,6 +2,9 @@
   "name": "@frontendkit/components",
   "version": "0.0.1",
   "type": "module",
+  "license": "ISC",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -9,12 +12,8 @@
       "require": "./dist/index.cjs"
     }
   },
-  "bin": {
-    "kit": "./bin/components.js"
-  },
   "files": [
-    "dist",
-    "bin"
+    "dist"
   ],
   "repository": {
     "type": "git",
@@ -29,8 +28,7 @@
     "build": "tsc && vite build",
     "watch": "tsc && vite build --watch",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "link-cli": "yarn --global unlink components && yarn --global link"
+    "preview": "vite preview"
   },
   "dependencies": {
     "antd": "^5.8.3",
