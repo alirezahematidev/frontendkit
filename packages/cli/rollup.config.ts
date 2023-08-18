@@ -19,11 +19,10 @@ export default defineConfig({
   ],
   output: {
     dir: path.resolve(__dirname, 'dist'),
-    format: 'esm',
     sourcemap: false,
     sourcemapIgnoreList() {
       return true;
     },
   },
-  external: ['prettier', 'fast-glob'],
+  external: ['prettier', 'fast-glob', 'commander', '@inquirer/select', 'fs-extra'],
 });

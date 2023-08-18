@@ -16,21 +16,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "src",
-    "src/frontend/**/*",
-    "src/frontend/**/*",
-    "src/frontend/**/*",
-    "src/frontend/**/*",
-    "src/frontend/**/*",
-    "src/frontend/**/*",
-    "src/frontend/**/*",
-    "src/frontend/**/*",
-    "src/frontend/**/*",
-    "src/frontend/**/*",
-    "src/frontend/**/*",
-    "src/frontend/**/*",
-    "src/frontend/**/*"
-  ],
+  "include": ["src", "src/frontend/**/*"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

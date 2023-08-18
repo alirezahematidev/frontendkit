@@ -1,7 +1,7 @@
 import './App.css';
 
-import { KitInput, type KitInputProps } from './input';
-import { KitButton, type KitButtonProps } from './button';
+import { KitInput, KitButton } from './core';
+import type { KitInputProps, KitButtonProps } from './core';
 
 export { KitButton, KitInput };
 

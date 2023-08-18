@@ -1,14 +1,18 @@
-import { resolve } from 'node:path';
+// import { resolve } from 'node:path';
 import * as fs from 'node:fs/promises';
-import glob from 'fast-glob';
-import { pathToFileURL } from 'node:url';
+// import { pathToFileURL } from 'node:url';
+// import { FrontkitConfiguration } from '../types/configs';
+import { Command } from 'commander';
+import select from '@inquirer/select';
+import { resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { FrontkitConfiguration } from '../types/configs';
+import glob from 'fast-glob';
+import fsExtra from 'fs-extra';
 
-// const DEFAULT_SOURCE = 'src';
+const program = new Command();
 
-// const DEFAULT_OUT = 'frontend';
-
-// frontkit.config.js
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 const absolutePath = (...paths: string[]) => resolve(process.cwd(), ...paths);
 
@@ -40,7 +44,11 @@ async function revalidateTsConfig() {
 
     const config = JSON.parse(buf.toString());
 
-    config.include = [...(config.include || []), 'src/frontend/**/*'];
+    const kitIncludes = 'src/frontend/**/*';
+
+    if (!(config.include || []).includes(kitIncludes)) {
+      config.include = [...(config.include || []), kitIncludes];
+    }
 
     const prettier = await import('prettier');
 
@@ -54,7 +62,18 @@ async function revalidateTsConfig() {
   }
 }
 
-async function executeCommand() {
+const basePath = resolve(__dirname, '../../components/src/core');
+
+async function copyDirectory(component: string, source: string, destination: string) {
+  try {
+    await fsExtra.copy(source, destination);
+    console.log(`${component} component is successfully generated`);
+  } catch (error) {
+    console.error(`Error copying ${component} component:`, error);
+  }
+}
+
+async function generateComponent(component: string) {
   const frontkitConfigFile = await getFrontendkitConfigFile();
 
   const content: FrontkitConfiguration | undefined = frontkitConfigFile
@@ -64,18 +83,122 @@ async function executeCommand() {
   const paths = content && content.output ? content.output.split('/') : ['src', 'frontend'];
 
   try {
-    await fs.access(absolutePath(...paths), fs.constants.R_OK);
+    await fsExtra.ensureDir(absolutePath(...paths));
   } catch (error) {
-    await fs.mkdir(absolutePath(...paths));
+    //
   }
+
+  const componentsFolder = absolutePath(...paths, 'components');
 
   try {
-    await fs.access(absolutePath(...paths, 'components'), fs.constants.R_OK);
+    await fsExtra.ensureDir(componentsFolder);
   } catch (error) {
-    await fs.mkdir(absolutePath(...paths, 'components'));
+    //
   }
 
-  await revalidateTsConfig();
+  const source = resolve(basePath, component);
+
+  const destination = resolve(componentsFolder, component);
+
+  await Promise.all([copyDirectory(component, source, destination), revalidateTsConfig()]);
 }
 
-executeCommand().catch(console.error);
+// executeCommand().catch(console.error);
+
+type ComponentEntry = {
+  name: string;
+  value: string;
+};
+
+function capitalize(name: string): string {
+  return name.slice(0, 1).toUpperCase() + name.slice(1);
+}
+
+function toComponentEntry(entry: string): ComponentEntry {
+  return {
+    value: entry,
+    name: capitalize(entry),
+  };
+}
+
+function validateDirectory(dir: string | undefined): dir is string {
+  return Boolean(dir);
+}
+
+function getComponentValue(componentEntry: ComponentEntry) {
+  return componentEntry.value;
+}
+
+async function getComponentFiles(): Promise<ComponentEntry[]> {
+  const files = await fs.readdir(basePath);
+
+  const directories = files.map(async (file) => {
+    const filePath = resolve(basePath, file);
+
+    const stats = await fs.lstat(filePath);
+
+    if (stats.isDirectory()) return file;
+  });
+
+  const promisifies = await Promise.all(directories);
+
+  const entries = promisifies.filter(validateDirectory);
+
+  const components: ComponentEntry[] = entries.map(toComponentEntry);
+
+  return components;
+}
+
+program
+  .command('generate [component]')
+  .description('generate a component')
+  .action(async (component: string | undefined) => {
+    const components = await getComponentFiles();
+    console.log(process.argv);
+
+    if (component) {
+      const componentValues = components.map(getComponentValue);
+
+      if (component === '*') {
+        await Promise.all(componentValues.map(generateComponent));
+
+        process.exit(0);
+      }
+
+      if (/[a-zA-Z0-9_-]\*$/g.test(component)) {
+        const text = component.replace(/\*/g, '');
+
+        const filteredComponents = componentValues.filter((value) => value.startsWith(text));
+
+        await Promise.all(filteredComponents.map(generateComponent));
+
+        process.exit(0);
+      }
+
+      if (/^\*[a-zA-Z0-9_-]/g.test(component)) {
+        const text = component.replace(/\*/g, '');
+
+        const filteredComponents = componentValues.filter((value) => value.endsWith(text));
+
+        await Promise.all(filteredComponents.map(generateComponent));
+
+        process.exit(0);
+      }
+
+      if (!componentValues.includes(component)) {
+        console.log(`${component} does not exists. pick another available component`);
+        process.exit(1);
+      }
+
+      return await generateComponent(component);
+    }
+
+    const answer = await select({
+      message: 'pick a component',
+      choices: components,
+    });
+
+    await generateComponent(answer);
+  });
+
+program.parse(process.argv);

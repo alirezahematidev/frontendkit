@@ -34,7 +34,9 @@
   },
   "dependencies": {
     "esbuild": "^0.19.2",
-    "rollup": "^3.28.0"
+    "rollup": "^3.28.0",
+    "commander": "11.0.0",
+    "@inquirer/select": "1.2.8"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.2.0",
