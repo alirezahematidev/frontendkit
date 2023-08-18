@@ -1,6 +1,6 @@
 {
   "name": "@frontendkit/cli",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "> TODO: description",
   "license": "ISC",
   "type": "module",
@@ -8,6 +8,12 @@
   "types": "./dist/index.d.ts",
   "bin": {
     "kit": "./bin/frontkit-cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
   "files": [
     "dist",
