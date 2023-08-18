@@ -5,6 +5,7 @@ on:
     tags:
       - "components*"
       - "utilities*"
+      - "cli*"
 
 jobs:
   publish:
