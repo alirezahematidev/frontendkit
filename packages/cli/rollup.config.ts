@@ -24,5 +24,5 @@ export default defineConfig({
       return true;
     },
   },
-  external: ['prettier', 'fast-glob', 'commander', '@inquirer/select', 'fs-extra'],
+  external: ['prettier', 'fast-glob', 'commander', '@inquirer/select', 'fs-extra', 'vite'],
 });

@@ -74,10 +74,7 @@
     "tsx": "^3.12.7",
     "uuid": "9.0.0",
     "typescript": "^5.0.2",
-    "unbuild": "^1.2.1",
-    "@frontendkit/components": "workspace:*",
-    "@frontendkit/utilities": "workspace:*",
-    "@frontendkit/cli": "workspace:*"
+    "unbuild": "^1.2.1"
   },
   "packageManager": "pnpm@8.6.12",
   "pnpm": {

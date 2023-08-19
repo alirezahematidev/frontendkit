@@ -1,7 +1,4 @@
-// import { resolve } from 'node:path';
 import * as fs from 'node:fs/promises';
-// import { pathToFileURL } from 'node:url';
-// import { FrontkitConfiguration } from '../types/configs';
 import { Command } from 'commander';
 import select from '@inquirer/select';
 import { resolve } from 'node:path';
@@ -9,14 +6,13 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { FrontkitConfiguration } from '../types/configs';
 import glob from 'fast-glob';
 import fsExtra from 'fs-extra';
+import { getAlias } from './core/config/alias';
 
 const program = new Command();
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 const absolutePath = (...paths: string[]) => resolve(process.cwd(), ...paths);
-
-const tsConfigPath = resolve(process.cwd(), 'tsconfig.json');
 
 async function getFrontendkitConfigFile() {
   try {
@@ -38,17 +34,27 @@ async function getFrontendkitConfigFile() {
 
 async function revalidateTsConfig() {
   try {
+    const { rootName, tsConfigPath } = getAlias();
+
     await fs.access(tsConfigPath, fs.constants.O_RDWR);
 
     const buf = await fs.readFile(tsConfigPath);
 
     const config = JSON.parse(buf.toString());
 
-    const kitIncludes = 'src/frontend/**/*';
+    const kitIncludes = 'src/components/**/*';
 
     if (!(config.include || []).includes(kitIncludes)) {
       config.include = [...(config.include || []), kitIncludes];
     }
+
+    config.compilerOptions = config.compilerOptions ?? {};
+
+    config.compilerOptions.baseUrl = '.';
+
+    const aliasPaths = { [`@${rootName}/components`]: ['src/components'] };
+
+    config.compilerOptions.paths = { ...config.paths, ...aliasPaths };
 
     const prettier = await import('prettier');
 
@@ -73,6 +79,10 @@ async function copyDirectory(component: string, source: string, destination: str
   }
 }
 
+function componentExportStatement(name: string) {
+  return `export * from "./${name}";\n`;
+}
+
 async function generateComponent(component: string) {
   const frontkitConfigFile = await getFrontendkitConfigFile();
 
@@ -80,18 +90,20 @@ async function generateComponent(component: string) {
     ? (await import(pathToFileURL(frontkitConfigFile).toString())).default
     : undefined;
 
-  const paths = content && content.output ? content.output.split('/') : ['src', 'frontend'];
+  const paths = content && content.output ? content.output.split('/') : ['src', 'components'];
+
+  const componentsFolder = absolutePath(...paths);
 
   try {
-    await fsExtra.ensureDir(absolutePath(...paths));
+    await fsExtra.ensureDir(componentsFolder);
   } catch (error) {
     //
   }
 
-  const componentsFolder = absolutePath(...paths, 'components');
+  const root = resolve(componentsFolder, 'index.ts');
 
   try {
-    await fsExtra.ensureDir(componentsFolder);
+    await fsExtra.ensureFile(root);
   } catch (error) {
     //
   }
@@ -101,6 +113,26 @@ async function generateComponent(component: string) {
   const destination = resolve(componentsFolder, component);
 
   await Promise.all([copyDirectory(component, source, destination), revalidateTsConfig()]);
+
+  const rootContent = await fsExtra.readFile(root, { encoding: 'utf8' });
+
+  const regex = /export \* from ['"]\.\/(\w+)['"];/gm;
+
+  const chunks = rootContent.split('\n');
+
+  const matches = chunks.map((chunk) => {
+    const exec = regex.exec(chunk) || [];
+
+    chunk.match(regex);
+
+    return exec[1];
+  });
+
+  const uniqueMatches = [...new Set(matches)].filter(Boolean);
+
+  if (!uniqueMatches.includes(component)) {
+    await fsExtra.appendFile(root, componentExportStatement(component));
+  }
 }
 
 // executeCommand().catch(console.error);
@@ -154,33 +186,12 @@ program
   .description('generate a component')
   .action(async (component: string | undefined) => {
     const components = await getComponentFiles();
-    console.log(process.argv);
 
     if (component) {
       const componentValues = components.map(getComponentValue);
 
       if (component === '*') {
         await Promise.all(componentValues.map(generateComponent));
-
-        process.exit(0);
-      }
-
-      if (/[a-zA-Z0-9_-]\*$/g.test(component)) {
-        const text = component.replace(/\*/g, '');
-
-        const filteredComponents = componentValues.filter((value) => value.startsWith(text));
-
-        await Promise.all(filteredComponents.map(generateComponent));
-
-        process.exit(0);
-      }
-
-      if (/^\*[a-zA-Z0-9_-]/g.test(component)) {
-        const text = component.replace(/\*/g, '');
-
-        const filteredComponents = componentValues.filter((value) => value.endsWith(text));
-
-        await Promise.all(filteredComponents.map(generateComponent));
 
         process.exit(0);
       }
