@@ -12,7 +12,7 @@ release({
 
       await run('npx', args, { cwd: `packages/${pkgName}` });
     } catch (error) {
-      console.log(error);
+      //
     }
   },
 });
