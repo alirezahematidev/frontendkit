@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import { Command } from 'commander';
 import select from '@inquirer/select';
-import { resolve } from 'node:path';
+import { basename, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import glob from 'fast-glob';
 import fsExtra from 'fs-extra';
@@ -35,13 +35,17 @@ async function getFrontendkitConfigFile() {
   }
 }
 
-async function revalidateTsConfig() {
+async function revalidateTsConfig(output: string | undefined) {
   try {
-    const { rootName, tsConfigPath } = getAlias();
+    const { rootName, tsConfigPath } = getAlias(output);
 
-    await fs.access(tsConfigPath, fs.constants.O_RDWR);
+    const _path = output ? resolve(process.cwd(), output, 'tsconfig.json') : tsConfigPath;
 
-    const buf = await fs.readFile(tsConfigPath);
+    const base = output ? basename(output) : rootName;
+
+    await fs.access(_path, fs.constants.O_RDWR);
+
+    const buf = await fs.readFile(_path);
 
     const config = JSON.parse(buf.toString());
 
@@ -55,17 +59,17 @@ async function revalidateTsConfig() {
 
     config.compilerOptions.baseUrl = '.';
 
-    const aliasPaths = { [`@${rootName}/components`]: ['src/components'] };
+    const aliasPaths = { [`@${base}/components`]: ['src/components'] };
 
     config.compilerOptions.paths = { ...config.paths, ...aliasPaths };
 
     const prettier = await import('prettier');
 
-    const options = await prettier.resolveConfig(tsConfigPath);
+    const options = await prettier.resolveConfig(_path);
 
     const formattedConfig = await prettier.format(JSON.stringify(config), { ...options, parser: 'json' });
 
-    await fs.writeFile(tsConfigPath, formattedConfig);
+    await fs.writeFile(_path, formattedConfig);
   } catch (error) {
     //
   }
@@ -93,9 +97,28 @@ async function generateComponent(component: string, scope?: string) {
 
   const content = buf ? JSON.parse(buf.toString()) : undefined;
 
-  const scopeConfig = scope ? content[scope] : content;
+  let userConfig = content;
 
-  const paths = scopeConfig && scopeConfig.output && typeof scopeConfig.output === 'string' ? scopeConfig.output.split('/') : ['src', 'components'];
+  if (scope && content) {
+    if (!content[scope]) {
+      console.log('the scope: %s does not defined in kit.config.json', scope);
+      process.exit(1);
+    }
+
+    userConfig = content[scope];
+  }
+
+  let _output: string | undefined = undefined;
+
+  let paths = ['src', 'components'];
+
+  if (userConfig && userConfig.output && typeof userConfig.output === 'string') {
+    const configOutput = userConfig.output.split('/');
+
+    paths = [...configOutput, 'src', 'components'];
+
+    _output = scope ? resolve(...configOutput) : undefined;
+  }
 
   const componentsFolder = absolutePath(...paths);
 
@@ -117,7 +140,7 @@ async function generateComponent(component: string, scope?: string) {
 
   const destination = resolve(componentsFolder, component);
 
-  await Promise.all([copyDirectory(component, source, destination), revalidateTsConfig()]);
+  await Promise.all([copyDirectory(component, source, destination), revalidateTsConfig(_output)]);
 
   const rootContent = await fsExtra.readFile(root, { encoding: 'utf8' });
 

@@ -1,8 +1,8 @@
 {
   "sales": {
-    "output": "src/sales"
+    "output": "sales"
   },
   "marketing": {
-    "output": "src/marketing"
+    "output": "marketing"
   }
 }

@@ -3,7 +3,7 @@ import { getAlias } from './alias';
 import { resolve } from 'node:path';
 
 const overrideViteConfig = <C extends object>(config: C): UserConfig => {
-  const { rootName, cwd } = getAlias();
+  const { rootName, cwd } = getAlias(undefined);
 
   const customConfig = {
     resolve: {

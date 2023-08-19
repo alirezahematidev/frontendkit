@@ -14,7 +14,9 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": { "@sales/components": ["src/components"] }
   },
   "include": ["src", "src/components/**/*"],
   "references": [{ "path": "./tsconfig.node.json" }]
