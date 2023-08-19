@@ -1,11 +1,11 @@
 import * as fs from 'node:fs/promises';
 import { Command } from 'commander';
 import select from '@inquirer/select';
-import { basename, resolve } from 'node:path';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import glob from 'fast-glob';
 import fsExtra from 'fs-extra';
-import { getAlias } from './core/config/alias';
+// import { getAlias } from './core/config/alias';
 
 type Options = {
   scope?: string;
@@ -35,45 +35,45 @@ async function getFrontendkitConfigFile() {
   }
 }
 
-async function revalidateTsConfig(output: string | undefined) {
-  try {
-    const { rootName, tsConfigPath } = getAlias(output);
+// async function revalidateTsConfig(output: string | undefined) {
+//   try {
+//     const { rootName, tsConfigPath } = getAlias(output);
 
-    const _path = output ? resolve(process.cwd(), output, 'tsconfig.json') : tsConfigPath;
+//     const _path = output ? resolve(process.cwd(), output, 'tsconfig.json') : tsConfigPath;
 
-    const base = output ? basename(output) : rootName;
+//     const base = output ? basename(output) : rootName;
 
-    await fs.access(_path, fs.constants.O_RDWR);
+//     await fs.access(_path, fs.constants.O_RDWR);
 
-    const buf = await fs.readFile(_path);
+//     const buf = await fs.readFile(_path);
 
-    const config = JSON.parse(buf.toString());
+//     const config = JSON.parse(buf.toString());
 
-    const kitIncludes = 'src/components/**/*';
+//     const kitIncludes = 'src/components/**/*';
 
-    if (!(config.include || []).includes(kitIncludes)) {
-      config.include = [...(config.include || []), kitIncludes];
-    }
+//     if (!(config.include || []).includes(kitIncludes)) {
+//       config.include = [...(config.include || []), kitIncludes];
+//     }
 
-    config.compilerOptions = config.compilerOptions ?? {};
+//     config.compilerOptions = config.compilerOptions ?? {};
 
-    config.compilerOptions.baseUrl = '.';
+//     config.compilerOptions.baseUrl = '.';
 
-    const aliasPaths = { [`@${base}/components`]: ['src/components'] };
+//     const aliasPaths = { [`@${base}/components`]: ['src/components'] };
 
-    config.compilerOptions.paths = { ...config.paths, ...aliasPaths };
+//     config.compilerOptions.paths = { ...config.paths, ...aliasPaths };
 
-    const prettier = await import('prettier');
+//     const prettier = await import('prettier');
 
-    const options = await prettier.resolveConfig(_path);
+//     const options = await prettier.resolveConfig(_path);
 
-    const formattedConfig = await prettier.format(JSON.stringify(config), { ...options, parser: 'json' });
+//     const formattedConfig = await prettier.format(JSON.stringify(config), { ...options, parser: 'json' });
 
-    await fs.writeFile(_path, formattedConfig);
-  } catch (error) {
-    //
-  }
-}
+//     await fs.writeFile(_path, formattedConfig);
+//   } catch (error) {
+//     //
+//   }
+// }
 
 const basePath = resolve(__dirname, '../../components/src/core');
 
@@ -108,7 +108,7 @@ async function generateComponent(component: string, scope?: string) {
     userConfig = content[scope];
   }
 
-  let _output: string | undefined = undefined;
+  // let _output: string | undefined = undefined;
 
   let paths = ['src', 'components'];
 
@@ -117,7 +117,7 @@ async function generateComponent(component: string, scope?: string) {
 
     paths = [...configOutput, 'src', 'components'];
 
-    _output = scope ? resolve(...configOutput) : undefined;
+    // _output = scope ? resolve(...configOutput) : undefined;
   }
 
   const componentsFolder = absolutePath(...paths);
@@ -140,7 +140,8 @@ async function generateComponent(component: string, scope?: string) {
 
   const destination = resolve(componentsFolder, component);
 
-  await Promise.all([copyDirectory(component, source, destination), revalidateTsConfig(_output)]);
+  // revalidateTsConfig(_output)
+  await Promise.all([copyDirectory(component, source, destination)]);
 
   const rootContent = await fsExtra.readFile(root, { encoding: 'utf8' });
 
