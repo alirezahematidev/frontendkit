@@ -18,5 +18,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "types/**/*", "src/frontend/**/*"]
+  "include": ["src", "types/**/*"]
 }

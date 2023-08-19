@@ -7,8 +7,12 @@ release({
   toTag: (pkg, version) => `${pkg}@${version}`,
   logChangelog: logRecentCommits,
   generateChangelog: async (pkgName) => {
-    const args = ['--lerna-package', `@frontendkit/${pkgName}`];
+    try {
+      const args = ['--lerna-package', `@frontendkit/${pkgName}`];
 
-    await run('npx', args, { cwd: `packages/${pkgName}` });
+      await run('npx', args, { cwd: `packages/${pkgName}` });
+    } catch (error) {
+      console.log(error);
+    }
   },
 });
