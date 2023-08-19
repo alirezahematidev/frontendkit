@@ -25,6 +25,10 @@
     "type": "git",
     "url": "git+https://github.com/alirezahematidev/frontendkit.git"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "test": "node ./__tests__/cli.test.js",
     "build": "rollup --config rollup.config.ts --configPlugin typescript"

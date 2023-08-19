@@ -2,16 +2,36 @@
   "name": "@frontendkit/utilities",
   "version": "0.0.1",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@types/node": "^18.17.3",
     "@vitejs/plugin-react-swc": "^3.3.2",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
     "vite-plugin-dts": "^3.5.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alirezahematidev/frontendkit.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }
