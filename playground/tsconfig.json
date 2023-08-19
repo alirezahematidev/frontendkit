@@ -14,8 +14,10 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": { "@playground/components": ["src/components"] }
   },
-  "include": ["src"],
+  "include": ["src", "src/components/**/*"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

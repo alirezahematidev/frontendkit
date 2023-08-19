@@ -2,11 +2,14 @@ import * as fs from 'node:fs/promises';
 import { Command } from 'commander';
 import select from '@inquirer/select';
 import { resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import { FrontkitConfiguration } from '../types/configs';
+import { fileURLToPath } from 'node:url';
 import glob from 'fast-glob';
 import fsExtra from 'fs-extra';
 import { getAlias } from './core/config/alias';
+
+type Options = {
+  scope?: string;
+};
 
 const program = new Command();
 
@@ -16,7 +19,7 @@ const absolutePath = (...paths: string[]) => resolve(process.cwd(), ...paths);
 
 async function getFrontendkitConfigFile() {
   try {
-    const [pickableFile, ...files] = await glob.async('frontkit.config.{json,js,ts,mjs,cjs}', { absolute: true });
+    const [pickableFile, ...files] = await glob.async('kit.config.json', { absolute: true });
 
     if (!pickableFile) return;
 
@@ -83,14 +86,16 @@ function componentExportStatement(name: string) {
   return `export * from "./${name}";\n`;
 }
 
-async function generateComponent(component: string) {
+async function generateComponent(component: string, scope?: string) {
   const frontkitConfigFile = await getFrontendkitConfigFile();
 
-  const content: FrontkitConfiguration | undefined = frontkitConfigFile
-    ? (await import(pathToFileURL(frontkitConfigFile).toString())).default
-    : undefined;
+  const buf = frontkitConfigFile ? await fs.readFile(frontkitConfigFile) : undefined;
 
-  const paths = content && content.output ? content.output.split('/') : ['src', 'components'];
+  const content = buf ? JSON.parse(buf.toString()) : undefined;
+
+  const scopeConfig = scope ? content[scope] : content;
+
+  const paths = scopeConfig && scopeConfig.output && typeof scopeConfig.output === 'string' ? scopeConfig.output.split('/') : ['src', 'components'];
 
   const componentsFolder = absolutePath(...paths);
 
@@ -184,14 +189,15 @@ async function getComponentFiles(): Promise<ComponentEntry[]> {
 program
   .command('generate [component]')
   .description('generate a component')
-  .action(async (component: string | undefined) => {
+  .option('-s, --scope <string>', 'generate for specific scope')
+  .action(async (component: string | undefined, { scope }: Options = {}) => {
     const components = await getComponentFiles();
 
     if (component) {
       const componentValues = components.map(getComponentValue);
 
       if (component === '*') {
-        await Promise.all(componentValues.map(generateComponent));
+        await Promise.all(componentValues.map(async (value) => await generateComponent(value, scope)));
 
         process.exit(0);
       }
@@ -201,7 +207,7 @@ program
         process.exit(1);
       }
 
-      return await generateComponent(component);
+      return await generateComponent(component, scope);
     }
 
     const answer = await select({
@@ -209,7 +215,7 @@ program
       choices: components,
     });
 
-    await generateComponent(answer);
+    await generateComponent(answer, scope);
   });
 
 program.parse(process.argv);
